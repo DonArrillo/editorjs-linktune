@@ -1,51 +1,51 @@
-const path = require('path');
-
 module.exports = {
-  entry: './src/index.ts',
-
+  mode: "production",
+  devtool: "inline-source-map",
+  entry: {
+    index: "./src/index.ts",
+  },
+  output: {
+    filename: "[name].js",
+    path: __dirname + "/dist",
+    library: "editorjs-linktune",
+    libraryTarget: "amd",
+  },
   module: {
     rules: [
       {
-        test: /\.ts$/,
-        exclude: [/node_modules/, /test/],
-        use: [{ loader: 'ts-loader' }],
-      },
-
-      {
-        test: /\.pcss$/,
+        test: /\.css$/i,
         use: [
-          'style-loader',
-          'css-loader',
+          "style-loader",
           {
-            loader: 'postcss-loader',
+            loader: "@teamsupercell/typings-for-css-modules-loader",
+          },
+          {
+            loader: "css-loader",
             options: {
-              postcssOptions: {
-                plugins: [
-                  require('postcss-simple-vars'),
-                  require('postcss-nested-ancestors'),
-                  require('postcss-nested'),
-                ],
-              },
+              modules: true,
             },
           },
         ],
       },
-
       {
-        test: /\.svg$/,
-        loader: 'svg-inline-loader',
+        test: /\.tsx?$/,
+        use: "ts-loader",
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+            plugins: ["@babel/plugin-proposal-object-rest-spread"],
+          },
+        },
       },
     ],
   },
   resolve: {
-    extensions: ['.ts'],
-  },
-  output: {
-    path: path.join(__dirname, '/dist'),
-    publicPath: '/',
-    filename: 'bundle.js',
-    library: 'LinkTune',
-    libraryTarget: 'umd',
-    libraryExport: 'default',
+    extensions: [".tsx", ".ts", ".js"],
   },
 };

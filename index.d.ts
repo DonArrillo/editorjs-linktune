@@ -1,4 +1,3 @@
-import './../styles/index.pcss';
 declare type SearchItemData = {
     href: string;
     name: string;

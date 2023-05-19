@@ -1,10 +1,10 @@
 {
   "name": "editorjs-linktune",
-  "version": "0.3.10",
+  "version": "0.1.0",
   "description": "Add a link to a whole block (like an image) in EditorJS",
-  "main": "./dist/bundle.js",
+  "main": "./dist/index.js",
   "scripts": {
-    "build": "webpack --mode production",
+    "build": "webpack",
     "build:dev": "webpack --mode development --watch",
     "test": "jest",
     "lint": "eslint ."
@@ -52,18 +52,5 @@
     "postcss-nested": "^5.0.3",
     "postcss-nested-ancestors": "^2.0.0",
     "postcss-simple-vars": "^6.0.3"
-  },
-  "jest": {
-    "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": [
-      "<rootDir>/test/config/setupTests.js"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "babel-jest",
-      "^.+\\.(css|svg)$": "<rootDir>/test/config/assetsTransform.js"
-    },
-    "transformIgnorePatterns": [
-      "/node_modules/(?!uuid)"
-    ]
   }
 }
