@@ -144,6 +144,9 @@ export default class LinkTune {
     });
   }
 
+  /**
+   * Helper method to create an HTML element.
+   */
   protected createElm(type: string, classList: string[], attributes?: Record<string, string>): HTMLElement {
     const elm = window.document.createElement(type);
     classList.forEach((className) => elm.classList.add(className));
@@ -158,6 +161,9 @@ export default class LinkTune {
     return elm;
   }
 
+  /**
+   * Create the textfield to input the link.
+   */
   protected addLinkField(): HTMLElement {
     const wrap = this.createElm('div', ['ce-popover__item']);
     const icon = this.createElm('div', ['ce-popover__item-icon']);
@@ -168,8 +174,9 @@ export default class LinkTune {
     const linkField = this.linkField
     this.linkField.setAttribute('value', this.data);
 
+    // Throttle the link lookup.
+    const timeoutDelay = 200;
     this.linkField.addEventListener('keyup', (evt) => {
-      console.log(evt);
       if (evt.key === "Enter") {
         this.addLinkData(linkField.value)
         return;
@@ -185,11 +192,10 @@ export default class LinkTune {
           .then((results) => {
             this.generateSearchList(results)
           });
-      }, 200);
+      }, timeoutDelay);
     });
 
     label.appendChild(linkField);
-
     wrap.appendChild(label);
     wrap.appendChild(icon);
     icon.addEventListener('click', () => {
@@ -209,6 +215,12 @@ export default class LinkTune {
     this.wrap(this.blockContent);
   }
 
+  /**
+   * The mandatory render method required by the API.
+   *
+   * The actual rendering is mainly placed in other methods.
+   * @returns
+   */
   public render(): HTMLElement {
     const wrapper = window.document.createElement('div');
     const button = this.addLinkField();
@@ -219,8 +231,8 @@ export default class LinkTune {
   }
 
   /**
- * Send search request
- */
+   * Send search request
+  */
   async searchRequest(searchString: string): Promise<SearchItemData[]> {
     /**
      * Compose query string
@@ -245,11 +257,8 @@ export default class LinkTune {
       } else {
         console.warn('Link Autocomplete: invalid response format: "success: true" expected, but got %o. Response: %o', searchResponse.success, searchResponse);
       }
-    } catch (e) {
-      //   notifier.show({
-      //     message: `${DICTIONARY.searchRequestError} "${e.message}"`,
-      //     style: 'error',
-      //   });
+    } catch (e: any) {
+      console.error(e.message)
     }
 
     return [];
