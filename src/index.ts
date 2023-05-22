@@ -1,5 +1,3 @@
-// import './../styles/index.pcss';
-
 type SearchItemData = {
   href: string
   name: string
