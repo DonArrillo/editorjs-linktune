@@ -4,7 +4,7 @@ type SearchItemData = {
   description: string
 }
 
-export class LinkTune {
+export default class LinkTune {
   data: string
   blockContent: any
   searchEndpointUrl: string
@@ -14,7 +14,6 @@ export class LinkTune {
   linkField: HTMLInputElement;
 
   constructor({ data, config }: any) {
-
     if (!data) {
       data = '';
     }
@@ -38,7 +37,7 @@ export class LinkTune {
     blockContent.style.paddingLeft = '';
     blockContent.querySelector('.styled-blocks-label')?.remove();
     if (this.data) {
-      blockContent.style.border = '1px solid red';
+      blockContent.style.border = '1px solid blue';
     }
     this.blockContent = blockContent;
     return blockContent;
@@ -138,8 +137,7 @@ export class LinkTune {
 
       searchItem.addEventListener('click', (ev: MouseEvent) => {
         this.linkField.value = searchItem.dataset.href + "";
-        this.data = this.linkField.value;
-        this.wrap(this.blockContent);
+        this.addLinkData(this.linkField.value);
       });
 
       this.searchResultWrap.appendChild(searchItem);
@@ -163,18 +161,31 @@ export class LinkTune {
   protected addLinkField(): HTMLElement {
     const wrap = this.createElm('div', ['ce-popover__item']);
     const icon = this.createElm('div', ['ce-popover__item-icon']);
-    icon.innerHTML = 'L';
+    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16"><path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"/><path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"/></svg>';
 
     // Create label
     const label = this.createElm('div', ['ce-popover__item-label']);
     const linkField = this.linkField
     this.linkField.setAttribute('value', this.data);
 
-    this.linkField.addEventListener('keyup', () => {
-      this.searchRequest(linkField.value)
-        .then((results) => {
-          this.generateSearchList(results)
-        });
+    this.linkField.addEventListener('keyup', (evt) => {
+      console.log(evt);
+      if (evt.key === "Enter") {
+        this.addLinkData(linkField.value)
+        return;
+      }
+      let throttle;
+      clearTimeout(throttle);
+      if (linkField.value.length < 2) {
+        this.clearSearchList();
+        return;
+      }
+      throttle = setTimeout(() => {
+        this.searchRequest(linkField.value)
+          .then((results) => {
+            this.generateSearchList(results)
+          });
+      }, 200);
     });
 
     label.appendChild(linkField);
@@ -182,10 +193,20 @@ export class LinkTune {
     wrap.appendChild(label);
     wrap.appendChild(icon);
     icon.addEventListener('click', () => {
-      this.data = linkField.value;
-      this.wrap(this.blockContent);
+      this.addLinkData(linkField.value);
     });
     return wrap;
+  }
+
+  /**
+   * Set tune data, clear list and add marking to the block.
+   *
+   * @param link
+   */
+  protected addLinkData(link: string) {
+    this.clearSearchList();
+    this.data = link;
+    this.wrap(this.blockContent);
   }
 
   public render(): HTMLElement {

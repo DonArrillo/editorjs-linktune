@@ -36,7 +36,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LinkTune = void 0;
 var LinkTune = /** @class */ (function () {
     function LinkTune(_a) {
         var data = _a.data, config = _a.config;
@@ -66,7 +65,7 @@ var LinkTune = /** @class */ (function () {
         blockContent.style.paddingLeft = '';
         (_a = blockContent.querySelector('.styled-blocks-label')) === null || _a === void 0 ? void 0 : _a.remove();
         if (this.data) {
-            blockContent.style.border = '1px solid red';
+            blockContent.style.border = '1px solid blue';
         }
         this.blockContent = blockContent;
         return blockContent;
@@ -156,8 +155,7 @@ var LinkTune = /** @class */ (function () {
             searchItem.dataset.description = item.description;
             searchItem.addEventListener('click', function (ev) {
                 _this.linkField.value = searchItem.dataset.href + "";
-                _this.data = _this.linkField.value;
-                _this.wrap(_this.blockContent);
+                _this.addLinkData(_this.linkField.value);
             });
             _this.searchResultWrap.appendChild(searchItem);
         });
@@ -178,25 +176,47 @@ var LinkTune = /** @class */ (function () {
         var _this = this;
         var wrap = this.createElm('div', ['ce-popover__item']);
         var icon = this.createElm('div', ['ce-popover__item-icon']);
-        icon.innerHTML = 'L';
+        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16"><path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"/><path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"/></svg>';
         // Create label
         var label = this.createElm('div', ['ce-popover__item-label']);
         var linkField = this.linkField;
         this.linkField.setAttribute('value', this.data);
-        this.linkField.addEventListener('keyup', function () {
-            _this.searchRequest(linkField.value)
-                .then(function (results) {
-                _this.generateSearchList(results);
-            });
+        this.linkField.addEventListener('keyup', function (evt) {
+            console.log(evt);
+            if (evt.key === "Enter") {
+                _this.addLinkData(linkField.value);
+                return;
+            }
+            var throttle;
+            clearTimeout(throttle);
+            if (linkField.value.length < 2) {
+                _this.clearSearchList();
+                return;
+            }
+            throttle = setTimeout(function () {
+                _this.searchRequest(linkField.value)
+                    .then(function (results) {
+                    _this.generateSearchList(results);
+                });
+            }, 200);
         });
         label.appendChild(linkField);
         wrap.appendChild(label);
         wrap.appendChild(icon);
         icon.addEventListener('click', function () {
-            _this.data = linkField.value;
-            _this.wrap(_this.blockContent);
+            _this.addLinkData(linkField.value);
         });
         return wrap;
+    };
+    /**
+     * Set tune data, clear list and add marking to the block.
+     *
+     * @param link
+     */
+    LinkTune.prototype.addLinkData = function (link) {
+        this.clearSearchList();
+        this.data = link;
+        this.wrap(this.blockContent);
     };
     LinkTune.prototype.render = function () {
         var wrapper = window.document.createElement('div');
@@ -242,4 +262,4 @@ var LinkTune = /** @class */ (function () {
     };
     return LinkTune;
 }());
-exports.LinkTune = LinkTune;
+exports.default = LinkTune;
